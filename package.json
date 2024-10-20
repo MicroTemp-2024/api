@@ -1,6 +1,7 @@
 {
   "name": "api",
   "version": "0.1.0",
+  "homepage": "https://microtronic.biz/api/",
   "private": true,
   "scripts": {
     "dev": "next dev",
