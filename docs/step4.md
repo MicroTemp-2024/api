@@ -71,4 +71,36 @@ Click to Button >> Done
 
 Go to Project on VS Code
 
+Create a new file `root/.evn`
 
+~~~evn
+MONGODB_URI=mongodb+srv://Admin:<db_password>@cluster0.7f15f.mongodb.net/
+~~~
+
+Chang `<db_password>` for your password
+
+Save and close
+
+Verify Environment Variable Loading :
+
+Make sure you are loading environment variables from your `.env` file. You likely need the `dotenv` package :
+
+~~~bash
+npm install dotenv
+~~~
+
+Edit file `root/.gitignore`
+
+~~~.gitignore
+// ... rest code
+
+# local env files
+.env*.local
+.env
+
+// ... rest code
+~~~
+
+Save and close
+
+[Next Step >>](step5.md)

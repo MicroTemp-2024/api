@@ -1,3 +1,100 @@
+# Step 5
+
+Create file `/lib/mongodb.js`
+
+~~~JavaScript
+// root/lib/mongodb.js
+import mongoose from "mongoose";
+
+export const connectMongoDB = async () => {
+    try {
+        {/* Connect By $MONGODB_URI in .evn file */}
+        await mongoose.connect(process.env.MONGODB_URI);
+        {/* for success */}
+        console.log("MongoDB connected");
+    } catch (error) {
+        {/* for error */}
+        console.log(error);
+    }
+}
+
+// import mongoose from "mongoose";
+~~~
+
+Create file `/models/user.js`
+
+~~~JavaScript
+import mongoose, { Schema } from "mongoose";
+
+const UserSchema = new Schema({
+    name: {
+        type: String,
+        required: true,
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+    password: {
+        type: String,
+        required: true,
+    },
+    role: {
+        type: String,
+        required: false,
+        default: "user",
+    },
+
+},
+    { timestamps: true },
+);
+
+const User = mongoose.models.User || mongoose.model("User", UserSchema);
+
+export default User;
+~~~
+
+Edit file `/src/app/api/register/route.js`
+
+~~~JavaScript
+import { NextResponse } from "next/server";
+import { connectMongoDB } from "../../../../lib/mongogb";
+import User from "../../../../models/user";
+import bcrypt from "bcryptjs";
+
+export async function POST(req) {
+    try {
+        const { name, email, password } = await req.json();
+
+        {/* + code step 5 */}
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        await connectMongoDB();
+        await User.create({
+            name,
+            email,
+            password: hashedPassword,
+        });
+        {/* end + code step 5 */}
+
+        {/* remove 
+        console.log("name", name),
+        console.log("email", email),
+        console.log("password", password)
+        */}
+
+        return NextResponse.json({ message: "User registered successfully" }, { status: 201 });
+
+    } catch (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+}
+~~~
+
+Edit file `/src/app/register/page.jsx`
+
+~~~JavaScript
 "use client"
 
 import React, { useState } from 'react'
@@ -11,9 +108,9 @@ function page() {
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
     const [error, setError] = useState('')
-    {/* + code */}
+    {/* + code step 5 */}
     const [success, setSuccess] = useState('')
-    {/* end + code */}
+    {/* end + code step 5 */}
 
     {/* for re-check data input */}
     // console.log(name, email, password, confirmPassword)
@@ -34,24 +131,6 @@ function page() {
         }
 
         try {
-
-            {/* + code step 6 sniper to api recheckuser method POST */}
-            const resCheckUser = await fetch("http://localhost:3000/api/checkuser", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ email })
-            })
-
-            const { user } = await resCheckUser.json()
-
-            if (user) {
-                setError('User already exists')
-                return;
-            }
-            {/* + end code step 6 */}
-
             // sniper to api register method POST
             const res = await fetch('http://localhost:3000/api/register', {
                 method: 'POST',
@@ -67,7 +146,7 @@ function page() {
                 setError('');
                 {/* + code step 5 */}
                 setSuccess('User registered successfully');
-                {/* end + code step 5*/}
+                {/* end + code step 5 */}
                 form.reset();
             } else {
                 console.log('user registered failed')
@@ -90,7 +169,7 @@ function page() {
 
                 {/* + code step 5 */}
                 {success && (<div className='bg-green-500 w-fit text-sm text-white py-1 px-3 rounded-md my-2'>{success}</div>)}
-                {/* end + code step 5*/}
+                {/* end + code step 5 */}
 
                 <input onChange={(e) => setName(e.target.value)} className='block bg-gray-300 p-2 my-2 rounded-md' type="text" placeholder='Enter your name' />
                 <input onChange={(e) => setEmail(e.target.value)} className='block bg-gray-300 p-2 my-2 rounded-md' type="email" placeholder='Enter your email' />
@@ -106,3 +185,6 @@ function page() {
 }
 
 export default page
+~~~
+
+[Next Step >>](step6.md)

@@ -1,3 +1,39 @@
+# step 6
+
+Check for duplicate email users
+
+1. Create file `src/app/api/checkuser/route.js`
+
+~~~JavaScript
+import { NextResponse } from "next/server";
+import { connectMongoDB } from "../../../../lib/mongogb";
+import User from "../../../../models/user";
+
+export async function POST(req) {
+    try {
+
+        await connectMongoDB();
+        const { email } = await req.json();
+        const user = await User.findOne({ email }).select("_id");
+
+        console.log(user);
+
+        if (user) {
+            return NextResponse.json({ user });
+        }
+
+    } catch (error) {
+
+        console.log(error);
+
+        return NextResponse.json({ message: "Something went wrong" }, { status: 500 });
+    }
+}
+~~~
+
+2. Edit file `/src/app/register/page.jsx`
+
+~~~JavaScript
 "use client"
 
 import React, { useState } from 'react'
@@ -11,9 +47,9 @@ function page() {
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
     const [error, setError] = useState('')
-    {/* + code */}
+    {/* + code step 5 */}
     const [success, setSuccess] = useState('')
-    {/* end + code */}
+    {/* end + code step 5 */}
 
     {/* for re-check data input */}
     // console.log(name, email, password, confirmPassword)
@@ -34,7 +70,7 @@ function page() {
         }
 
         try {
-
+            
             {/* + code step 6 sniper to api recheckuser method POST */}
             const resCheckUser = await fetch("http://localhost:3000/api/checkuser", {
                 method: "POST",
@@ -65,9 +101,11 @@ function page() {
             if (res.ok) {
                 const form = e.target;
                 setError('');
-                {/* + code step 5 */}
+
+                {/* + code step 5*/}
                 setSuccess('User registered successfully');
-                {/* end + code step 5*/}
+                {/* end + code step 5 */}
+
                 form.reset();
             } else {
                 console.log('user registered failed')
@@ -90,7 +128,7 @@ function page() {
 
                 {/* + code step 5 */}
                 {success && (<div className='bg-green-500 w-fit text-sm text-white py-1 px-3 rounded-md my-2'>{success}</div>)}
-                {/* end + code step 5*/}
+                {/* end + code step 5 */}
 
                 <input onChange={(e) => setName(e.target.value)} className='block bg-gray-300 p-2 my-2 rounded-md' type="text" placeholder='Enter your name' />
                 <input onChange={(e) => setEmail(e.target.value)} className='block bg-gray-300 p-2 my-2 rounded-md' type="email" placeholder='Enter your email' />
@@ -106,3 +144,8 @@ function page() {
 }
 
 export default page
+~~~
+
+Re-Check input duplicate email and users again
+
+[Next Step >>](step7.md)
