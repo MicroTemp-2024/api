@@ -57,3 +57,18 @@ Click to Button >> Connect to Cluster
 
 ![alt text](src/mongodb-step13.png)
 
+Click to Button >> MongoDB for VS Code
+
+![alt text](src/mongodb-step14.png)
+
+Copy :
+
+`mongodb+srv://Admin:<db_password>@cluster0.7f15f.mongodb.net/`
+
+Click to Button >> Done
+
+![alt text](src/mongodb-step15.png)
+
+Go to Project on VS Code
+
+
